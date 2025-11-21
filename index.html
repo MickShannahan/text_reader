@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="icon" href="./assets/img/logo.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/style/main.css">
+  <link rel="stylesheet" href="assets/style/style.css">
+  <title>text_reader</title>
+</head>
+
+<body data-bs-theme="dark">
+
+  <main>
+
+    <section class="main-reader" id="active-text-file">
+      <article>
+      </article>
+    </section>
+
+
+  </main>
+
+  <section>
+    <button class="settings-fab btn btn-indigo" data-bs-toggle="offcanvas" data-bs-target="#settings-tab">
+      <i class="bi bi-menu-app"></i>
+    </button>
+
+    <div class="offcanvas offcanvas-start" id="settings-tab">
+      <div class="offcanvas-body">
+
+        <!-- Add Text File -->
+        <form class="row mb-4" onsubmit="app.TextFilesController.addNewTextFile(event)">
+          <input type="file" name="textFile" accept=".txt,text/plain" class="form-control form-control-sm mb-2"
+            required>
+          <button type="submit" class="btn btn-indigo w-100"><i class="bi bi-plus"></i> Add File</button>
+        </form>
+
+        <hr class="my-3">
+
+        <!-- Text Files List -->
+        <section id="text-files-list" class="row mb-4">
+        </section>
+
+        <hr class="my-3">
+
+        <!-- App Settings Collapsible -->
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
+            data-bs-target="#readingSettings" aria-expanded="false" aria-controls="readingSettings">
+            <i class="bi bi-gear me-2"></i>Reading Settings
+          </button>
+        </div>
+
+        <!-- App Settings Form (Collapsed) -->
+        <form class="app-settings-form collapse" id="readingSettings">
+          <div class="mt-3">
+
+            <!-- Font Size -->
+            <div class="mb-3">
+              <label for="fontSize" class="form-label">
+                <i class="bi bi-type"></i> Font Size
+                <span id="fontSizeDisplay" class="badge bg-secondary float-end">16px</span>
+              </label>
+              <input type="range" id="fontSize" class="form-range" min="12" max="24" step="1">
+            </div>
+
+            <!-- Line Height -->
+            <div class="mb-3">
+              <label for="lineHeight" class="form-label">
+                <i class="bi bi-text-paragraph"></i> Line Height
+                <span id="lineHeightDisplay" class="badge bg-secondary float-end">1.6</span>
+              </label>
+              <input type="range" id="lineHeight" class="form-range" min="1" max="2.5" step="0.1">
+            </div>
+
+            <!-- Letter Spacing -->
+            <div class="mb-3">
+              <label for="letterSpacing" class="form-label">
+                <i class="bi bi-arrows-expand"></i> Letter Spacing
+                <span id="letterSpacingDisplay" class="badge bg-secondary float-end">0.0px</span>
+              </label>
+              <input type="range" id="letterSpacing" class="form-range" min="0" max="3" step="0.1">
+            </div>
+
+            <!-- Paragraph Spacing -->
+            <div class="mb-3">
+              <label for="paragraphSpacing" class="form-label">
+                <i class="bi bi-justify"></i> Paragraph Spacing
+                <span id="paragraphSpacingDisplay" class="badge bg-secondary float-end">1.5rem</span>
+              </label>
+              <input type="range" id="paragraphSpacing" class="form-range" min="0.5" max="3" step="0.25">
+            </div>
+
+            <!-- Max Width (in characters) -->
+            <div class="mb-3">
+              <label for="maxWidth" class="form-label">
+                <i class="bi bi-arrows-horizontal"></i> Line Width
+                <span id="maxWidthDisplay" class="badge bg-secondary float-end">60ch</span>
+              </label>
+              <input type="range" id="maxWidth" class="form-range" min="30" max="100" step="5">
+            </div>
+
+            <!-- Contrast -->
+            <div class="mb-3">
+              <label for="contrast" class="form-label">
+                <i class="bi bi-brightness-high"></i> Contrast
+                <span id="contrastDisplay" class="badge bg-secondary float-end">1.00</span>
+              </label>
+              <input type="range" id="contrast" class="form-range" min="0.5" max="2" step="0.1" value="1">
+            </div>
+
+            <!-- Font Family -->
+            <div class="mb-3">
+              <label for="fontFamily" class="form-label">
+                <i class="bi bi-fonts"></i> Font Family
+              </label>
+              <select id="fontFamily" class="form-select form-select-sm">
+                <option value="serif">Serif (Georgia, Times New Roman)</option>
+                <option value="sans-serif">Sans-Serif (Arial, Helvetica)</option>
+                <option value="monospace">Monospace (Courier, Courier New)</option>
+                <option value="'Garamond', serif">Garamond</option>
+                <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                <option value="'Palatino', serif">Palatino</option>
+              </select>
+            </div>
+
+            <!-- Text Align -->
+            <div class="mb-3">
+              <label for="textAlign" class="form-label">
+                <i class="bi bi-justify-left"></i> Text Alignment
+              </label>
+              <select id="textAlign" class="form-select form-select-sm">
+                <option value="left">Left Align</option>
+                <option value="center">Center Align</option>
+                <option value="right">Right Align</option>
+                <option value="justify">Justify</option>
+              </select>
+            </div>
+
+            <!-- Theme -->
+            <div class="mb-3">
+              <label for="theme" class="form-label">
+                <i class="bi bi-moon"></i> Theme
+              </label>
+              <select id="theme" class="form-select form-select-sm">
+                <option value="dark">Dark Mode</option>
+                <option value="light">Light Mode</option>
+              </select>
+            </div>
+
+            <!-- Background Color -->
+            <div class="mb-3">
+              <label for="backgroundColor" class="form-label">
+                <i class="bi bi-paint-bucket"></i> Background Color
+              </label>
+              <input type="color" id="backgroundColor" class="form-control form-control-color">
+            </div>
+
+            <!-- Text Color -->
+            <div class="mb-3">
+              <label for="textColor" class="form-label">
+                <i class="bi bi-palette"></i> Text Color
+              </label>
+              <input type="color" id="textColor" class="form-control form-control-color">
+            </div>
+
+            <!-- Save Button -->
+            <button type="submit" class="btn btn-success w-100">
+              <i class="bi bi-check-circle me-2"></i>Save Settings
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- SECTION links for bootstrap, axios, and auth -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <!-- !SECTION -->
+
+  <!-- Toast container for Pop notifications -->
+  <div id="pop-toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+  <!-- The start of our javascript -->
+  <script src="app/App.js" type="module"></script>
+
+</body>
+
+</html>

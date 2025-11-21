@@ -27,6 +27,7 @@ main {
 .main-reader {
   width: 80ch;
   max-width: 100%;
+  font-family: 'Atkinson Hyperlegible', sans-serif;
 }
 
 .settings-fab {
@@ -40,4 +41,12 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.badge {
+  border-radius: 50px;
+  --bs-bg-opacity: .2;
+  color: var(--bs-secondary);
+  padding: .0em .5em;
+  margin-inline: .25em;
 }

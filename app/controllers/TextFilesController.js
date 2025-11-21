@@ -166,7 +166,7 @@ export class TextFilesController {
     reader.onerror = () => {
       Pop.error(new Error('Failed to read file'))
     }
-    reader.readAsText(file)
+    reader.readAsText(file, 'UTF-8')
   }
 
   removeTextFile(textFileId) {

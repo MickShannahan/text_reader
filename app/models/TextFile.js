@@ -25,13 +25,14 @@ export class TextFile {
     const wordCount = TextAnalyzer.getWordCount(this.body)
     const formattedDate = TextAnalyzer.formatDate(this.createdAt)
     const progressPercentage = Math.round(this.readingProgress)
+    const isComplete = progressPercentage == 100
 
     return `
       <div class="card mb-2 text-file-card" onclick="app.TextFilesController.setActiveTextFile('${this.id}')">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <div class="flex-grow-1">
-              <h6 class="card-title mb-1">${this.title}</h6>
+              <h6 class="card-title mb-1"><i class="bi ${!isComplete ? 'bi-journal' : 'bi-journal-check'}"></i> ${this.title}</h6>
               <small class="text-muted">${wordCount} words • ${formattedDate}</small>
             </div>
             <button 

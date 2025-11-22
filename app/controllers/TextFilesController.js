@@ -2,6 +2,7 @@ import { AppState } from "../AppState.js";
 import { textFilesService } from "../services/TextFilesService.js";
 import { getFormData } from "../utils/FormHandler.js";
 import { Pop } from "../utils/Pop.js";
+import { CharsetDecoder } from "../utils/CharsetDecoder.js";
 
 
 export class TextFilesController {
@@ -153,20 +154,19 @@ export class TextFilesController {
       return
     }
 
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const fileContent = e.target.result
-      const textFileData = {
-        title: file.name.replace('.txt', ''),
-        body: fileContent
-      }
-      textFilesService.addTextFile(textFileData)
-      form.reset()
-    }
-    reader.onerror = () => {
-      Pop.error(new Error('Failed to read file'))
-    }
-    reader.readAsText(file, 'UTF-8')
+    // Use CharsetDecoder to handle encoding
+    CharsetDecoder.decodeFile(file)
+      .then(fileContent => {
+        const textFileData = {
+          title: file.name.replace('.txt', ''),
+          body: fileContent
+        }
+        textFilesService.addTextFile(textFileData)
+        form.reset()
+      })
+      .catch(error => {
+        Pop.error(error)
+      })
   }
 
   removeTextFile(textFileId) {

@@ -29,7 +29,7 @@ export class AppSettings {
     element.style.padding = '2rem'
     element.style.margin = '0 auto'
     element.style.lineHeight = `${this.lineHeight}`
-    element.style.filter = `contrast(${this.contrast})`
+    element.style.filter = `contrast(${this.contrast}) brightness(${this.contrast})`
 
     // Apply paragraph spacing to all p tags
     const paragraphs = element.querySelectorAll('p')

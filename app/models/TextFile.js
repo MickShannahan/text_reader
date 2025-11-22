@@ -77,7 +77,7 @@ export class TextFile {
           </div>
           <div class="mt-2">
             <div class="progress" style="height: 8px;">
-              <div class="progress-bar bg-success" role="progressbar" style="width: ${progressPercentage}%" aria-valuenow="${progressPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+              <div class="progress-bar bg-blue" role="progressbar" style="width: ${progressPercentage}%" aria-valuenow="${progressPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
             <small id="reading-progress-text" class="text-muted mt-1 d-block">${progressPercentage}% completed</small>
           </div>

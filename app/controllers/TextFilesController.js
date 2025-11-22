@@ -39,7 +39,7 @@ export class TextFilesController {
     if (AppState.activeTextFile) {
       // Get comment count for this file
       const commentCount = commentsService.getCommentsByTextFile(AppState.activeTextFile.id).length
-      
+
       // Create header with toggle button for active file
       const headerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -57,7 +57,7 @@ export class TextFilesController {
           </button>
         </div>
       `
-      
+
       activeTextFileElement.innerHTML = headerHTML + AppState.activeTextFile.ActiveTemplate
       this.setupScrollTracking()
 

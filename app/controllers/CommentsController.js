@@ -47,12 +47,12 @@ export class CommentsController {
       console.log('📝 Text selection event detected')
       const selection = window.getSelection()
       const selectedText = selection.toString().trim()
-      
+
       if (selectedText && selectedText.length > 0) {
         console.log('✅ Selected text:', selectedText.substring(0, 50))
         this.currentSelection = selectedText
         this.currentRange = selection.getRangeAt(0)
-        
+
         // Show comment box on Desktop only
         if (window.innerWidth >= 768) {
           this.showCommentBox(selectedText, this.currentRange)
@@ -66,7 +66,7 @@ export class CommentsController {
     }
 
     readerContent.addEventListener('mouseup', this.mouseupListener)
-    
+
     // Close popovers and comment box on outside click
     document.addEventListener('click', this.handleOutsideClick.bind(this))
 
@@ -99,10 +99,10 @@ export class CommentsController {
 
     const commentBox = document.querySelector('#comment-input-box')
     const popovers = document.querySelectorAll('.popover')
-    
+
     // Check if click is inside comment box
     const isClickInCommentBox = commentBox && commentBox.contains(event.target)
-    
+
     // Check if click is inside a popover
     let isClickInPopover = false
     popovers.forEach(popover => {
@@ -110,15 +110,15 @@ export class CommentsController {
         isClickInPopover = true
       }
     })
-    
+
     // Check if click is on a comment mark (would open popover)
     const isClickOnCommentMark = event.target.closest('.comment-mark')
-    
+
     // Close comment box if clicking outside it
     if (commentBox && !isClickInCommentBox && event.target.id !== 'comment-input-box') {
       this.closeCommentBox()
     }
-    
+
     // Close popovers if clicking outside them and not on another comment mark
     if (!isClickInPopover && !isClickOnCommentMark) {
       this.closeAllPopovers()
@@ -149,10 +149,10 @@ export class CommentsController {
    */
   showCommentBox(selectedText, range) {
     console.log('🎯 Showing comment box for text:', selectedText.substring(0, 30))
-    
+
     // Get selection position
     const rect = range.getBoundingClientRect()
-    
+
     // Check if comment box already exists, if not create it
     let commentBox = document.querySelector('#comment-input-box')
     if (!commentBox) {
@@ -243,7 +243,7 @@ export class CommentsController {
     }
 
     commentsService.addComment(AppState.activeTextFile.id, commentData)
-    
+
     // Refresh display
     this.highlightCommentsInText()
     this.registerCommentPopovers()
@@ -297,10 +297,10 @@ export class CommentsController {
     comments.forEach(comment => {
       const safeText = comment.selectedText
         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape regex special chars
-      
+
       const regex = new RegExp(`(?<!>)${safeText}(?!</span>)`, 'g')
       const popoverContent = comment.getPopoverContent().replace(/\"/g, '&quot;').replace(/\\n/g, ' ')
-      
+
       html = html.replace(regex, (match) => {
         return `<span class="comment-mark" data-comment-id="${comment.id}" data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="right" data-bs-content="${popoverContent}">${match}</span>`
       })
@@ -328,7 +328,7 @@ export class CommentsController {
       } catch (e) {
         // bootstrap not available, skip
       }
-      
+
       if (!popover) {
         try {
           new bootstrap.Popover(highlight, {
@@ -355,7 +355,7 @@ export class CommentsController {
     if (!commentsSidebar) return
 
     const comments = commentsService.getCommentsByTextFile(AppState.activeTextFile.id)
-    
+
     if (comments.length === 0) {
       commentsSidebar.innerHTML = '<p class="text-muted p-3 m-0">No comments yet</p>'
     } else {
@@ -378,7 +378,7 @@ export class CommentsController {
           </div>
         </div>
       `).join('')
-      
+
       commentsSidebar.innerHTML = `
         <div class="comments-header ps-3 pt-3 pb-2 border-bottom">
           <h6 class="m-0">Comments (${comments.length})</h6>

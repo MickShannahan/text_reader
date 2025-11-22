@@ -43,7 +43,7 @@ export class TextFilesController {
       // Create header with toggle button for active file
       const headerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="m-0">${AppState.activeTextFile.title}</h5>
+          <h5 class="m-0"></h5>
           <button 
             class="btn btn-sm btn-outline-secondary" 
             type="button" 

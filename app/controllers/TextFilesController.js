@@ -196,6 +196,7 @@ export class TextFilesController {
 
   setActiveTextFile(textFileId) {
     textFilesService.setActiveTextFile(textFileId)
+    bootstrap.Offcanvas.getOrCreateInstance('#settings-tab').hide()
   }
 
   addNewTextFile(event) {

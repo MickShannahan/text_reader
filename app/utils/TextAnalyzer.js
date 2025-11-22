@@ -6,7 +6,8 @@ export class TextAnalyzer {
 
   static getParagraphCount(text) {
     if (!text) return 0
-    return text.split(/\n\n+/).filter(paragraph => paragraph.trim().length > 0).length
+    // Use the same logic as splitIntoParagraphs to ensure consistency
+    return this.splitIntoParagraphs(text).length
   }
 
   static formatDate(date) {
@@ -22,16 +23,19 @@ export class TextAnalyzer {
   static splitIntoParagraphs(text) {
     if (!text) return []
 
-    // Split on multiple newlines (paragraph breaks)
-    const paragraphs = text.split(/\n\s*\n+/)
+    // Normalize line endings to \n
+    let normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+
+    // Split on one or more newlines to handle different paragraph separators
+    // This is more flexible than requiring double newlines
+    const paragraphs = normalized.split(/\n+/)
 
     return paragraphs
       .map(p => p.trim())
       .filter(p => p.length > 0)
       .map(p => {
-        // Replace single newlines within paragraphs with spaces
-        // This handles text that's wrapped with single newlines
-        return p.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()
+        // Collapse multiple spaces and preserve the content
+        return p.replace(/\s+/g, ' ').trim()
       })
   }
 }

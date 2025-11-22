@@ -9,10 +9,16 @@ export class TextFile {
     this.body = data.body || this.getFileBody(data)
     this.createdAt = data.createdAt ? new Date(data.createdAt) : new Date()
     this.readingProgress = data.readingProgress || 0
+    this.maxScrollPosition = data.maxScrollPosition || 0
+    this.lastParagraphRead = data.lastParagraphRead || -1
   }
 
   updateReadingProgress(percentage) {
     this.readingProgress = Math.min(Math.max(percentage, 0), 100)
+  }
+
+  updateMaxScrollPosition(scrollPixels) {
+    this.maxScrollPosition = Math.max(this.maxScrollPosition, scrollPixels)
   }
 
   get ListTemplate() {
@@ -51,7 +57,11 @@ export class TextFile {
     const formattedDate = TextAnalyzer.formatDate(this.createdAt)
     const progressPercentage = Math.round(this.readingProgress)
     const paragraphs = TextAnalyzer.splitIntoParagraphs(this.body)
-    const paragraphsHtml = paragraphs.map((p, idx) => `<p data-paragraph-index="${idx}">${p}</p>`).join('')
+    const paragraphsHtml = paragraphs.map((p, idx) => {
+      const isBookmarked = idx === this.lastParagraphRead
+      const bookmark = isBookmarked ? '<span class="bookmark-indicator" title="Last read">📍</span>' : ''
+      return `<p data-paragraph-index="${idx}">${bookmark} ${p}</p>`
+    }).join('')
 
     return `
       <div class="active-text-file-wrapper">
@@ -68,7 +78,7 @@ export class TextFile {
             <div class="progress" style="height: 8px;">
               <div class="progress-bar bg-success" role="progressbar" style="width: ${progressPercentage}%" aria-valuenow="${progressPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <small class="text-muted mt-1 d-block">${progressPercentage}% completed</small>
+            <small id="reading-progress-text" class="text-muted mt-1 d-block">${progressPercentage}% completed</small>
           </div>
         </div>
         <div class="reader-content" id="reader-content">

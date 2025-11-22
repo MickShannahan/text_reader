@@ -2,7 +2,8 @@
 body {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 main {
@@ -28,6 +29,9 @@ main {
   width: 80ch;
   max-width: 100%;
   font-family: 'Atkinson Hyperlegible', sans-serif;
+  max-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .settings-fab {
@@ -49,4 +53,20 @@ main {
   color: var(--bs-secondary);
   padding: .0em .5em;
   margin-inline: .25em;
+}
+
+.bookmark-indicator {
+  left: -3ch;
+  position: relative;
+  margin-right: -3.2ch;
+}
+
+.offcanvas {
+  width: 100dvw !important;
+}
+
+@media (min-width:768px) {
+  .offcanvas {
+    width: var(--bs-offcanvas-width) !important;
+  }
 }

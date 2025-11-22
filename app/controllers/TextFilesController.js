@@ -13,6 +13,9 @@ export class TextFilesController {
     this.setupScrollTracking = this.setupScrollTracking.bind(this)
     this.updateReadingProgress = this.updateReadingProgress.bind(this)
 
+    // Track maximum scroll position for this session
+    this.maxScrollTop = 0
+
     AppState.on('textFiles', this.drawTextFilesList)
     AppState.on('activeTextFile', this.drawActiveTextFile)
     textFilesService.loadTextFiles()
@@ -48,12 +51,27 @@ export class TextFilesController {
     if (mainReader) {
       AppState.appSettings.applySettings(mainReader)
     }
+
+    // Trigger initial progress display
+    setTimeout(() => {
+      this.updateReadingProgress()
+    }, 100)
   }
 
   setupScrollTracking() {
     const mainReader = document.querySelector('.main-reader')
     const readerContent = document.querySelector('#reader-content')
-    if (!mainReader || !readerContent || !AppState.activeTextFile) return
+    if (!mainReader || !readerContent || !AppState.activeTextFile) {
+      console.warn('❌ Cannot setup scroll tracking - missing elements')
+      return
+    }
+
+    // Restore scroll position from saved data (no conversion, no rounding!)
+    const savedMaxScroll = AppState.activeTextFile.maxScrollPosition
+    if (savedMaxScroll > 0) {
+      mainReader.scrollTop = savedMaxScroll
+      console.log(`📍 Restored scroll position to ${savedMaxScroll}px`)
+    }
 
     // Remove previous listener if exists
     if (this.scrollListener) {
@@ -62,15 +80,23 @@ export class TextFilesController {
 
     this.scrollListener = () => this.updateReadingProgress()
     mainReader.addEventListener('scroll', this.scrollListener)
+    console.log('✅ Scroll tracking setup complete')
   }
 
   updateReadingProgress() {
     const mainReader = document.querySelector('.main-reader')
     const readerContent = document.querySelector('#reader-content')
-    if (!mainReader || !readerContent || !AppState.activeTextFile) return
+
+    if (!mainReader || !readerContent || !AppState.activeTextFile) {
+      console.warn('⚠️ Missing required elements, bailing out')
+      return
+    }
 
     const paragraphs = readerContent.querySelectorAll('p')
-    if (paragraphs.length === 0) return
+    if (paragraphs.length === 0) {
+      console.warn('⚠️ No paragraphs found')
+      return
+    }
 
     // Calculate total scroll height
     const scrollTop = mainReader.scrollTop
@@ -78,49 +104,57 @@ export class TextFilesController {
     const clientHeight = mainReader.clientHeight
     const totalScrollableHeight = scrollHeight - clientHeight
 
-    // Calculate which paragraphs are visible
-    let visibleParagraphs = 0
-    let totalParagraphs = paragraphs.length
+    // Track the maximum scroll position reached (in pixels, not percentage)
+    if (scrollTop > AppState.activeTextFile.maxScrollPosition) {
+      AppState.activeTextFile.updateMaxScrollPosition(scrollTop)
+    }
 
-    paragraphs.forEach(paragraph => {
-      const rect = paragraph.getBoundingClientRect()
-      const readerRect = mainReader.getBoundingClientRect()
-
-      // Check if paragraph is in viewport
-      if (rect.top < readerRect.bottom && rect.bottom > readerRect.top) {
-        visibleParagraphs++
-      }
-    })
-
-    // Calculate progress based on scroll position and visible paragraphs
+    // Calculate progress percentage based on current max scroll
     let progressPercentage = 0
-
     if (totalScrollableHeight > 0) {
-      // Use scroll position as primary indicator
-      progressPercentage = (scrollTop / totalScrollableHeight) * 100
-    } else {
-      // If not scrollable, use paragraph visibility
-      progressPercentage = (visibleParagraphs / totalParagraphs) * 100
+      progressPercentage = (AppState.activeTextFile.maxScrollPosition / totalScrollableHeight) * 100
     }
 
     // Clamp between 0 and 100
     progressPercentage = Math.min(Math.max(progressPercentage, 0), 100)
+    console.log(`📈 Progress: ${progressPercentage.toFixed(2)}% (scroll: ${AppState.activeTextFile.maxScrollPosition}px)`)
 
-    // Update the active text file reading progress
+    // Update the active text file reading progress percentage
     AppState.activeTextFile.updateReadingProgress(progressPercentage)
 
-    // Update the progress bar in the reader
-    const progressBar = mainReader.querySelector('.progress-bar')
+    // Update the progress bar in the reader header
+    const progressBar = document.querySelector('#active-text-file .progress-bar')
     if (progressBar) {
       const roundedProgress = Math.round(progressPercentage)
       progressBar.style.width = roundedProgress + '%'
       progressBar.setAttribute('aria-valuenow', String(roundedProgress))
     }
 
-    // Update the progress text
-    const progressText = mainReader.querySelector('.reader-meta ~ .mt-2 small')
-    if (progressText) {
-      progressText.textContent = `${Math.round(progressPercentage)}% completed`
+    // Update the progress text in the reader header
+    const progressTextElement = document.querySelector('#reading-progress-text')
+    if (progressTextElement) {
+      const roundedProgress = Math.round(progressPercentage)
+      progressTextElement.textContent = `${roundedProgress}% completed`
+    }
+
+    // Track which paragraph the user is currently reading (for bookmark)
+    const allParagraphs = readerContent.querySelectorAll('p')
+    let currentParagraphIndex = -1
+
+    allParagraphs.forEach((para, idx) => {
+      const rect = para.getBoundingClientRect()
+      const readerRect = mainReader.getBoundingClientRect()
+
+      // Check if paragraph is in viewport
+      if (rect.top < readerRect.bottom && rect.bottom > readerRect.top) {
+        currentParagraphIndex = idx
+      }
+    })
+
+    // Update bookmark if we're at a different paragraph
+    if (currentParagraphIndex !== AppState.activeTextFile.lastParagraphRead) {
+      AppState.activeTextFile.lastParagraphRead = currentParagraphIndex
+      console.log(`📍 Bookmark updated to paragraph ${currentParagraphIndex}`)
     }
 
     // Redraw the list to show updated progress

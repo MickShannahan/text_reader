@@ -1,5 +1,7 @@
 import { AppState } from "../AppState.js";
 import { textFilesService } from "../services/TextFilesService.js";
+import { commentsService } from "../services/CommentsService.js";
+import { commentsController } from "./CommentsController.js";
 import { getFormData } from "../utils/FormHandler.js";
 import { Pop } from "../utils/Pop.js";
 import { CharsetDecoder } from "../utils/CharsetDecoder.js";
@@ -35,8 +37,33 @@ export class TextFilesController {
     if (!activeTextFileElement) return
 
     if (AppState.activeTextFile) {
-      activeTextFileElement.innerHTML = AppState.activeTextFile.ActiveTemplate
+      // Get comment count for this file
+      const commentCount = commentsService.getCommentsByTextFile(AppState.activeTextFile.id).length
+      
+      // Create header with toggle button for active file
+      const headerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="m-0">${AppState.activeTextFile.title}</h5>
+          <button 
+            class="btn btn-sm btn-outline-secondary" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#commentsSidebarCollapse" 
+            aria-expanded="false"
+            aria-controls="commentsSidebarCollapse"
+            title="Toggle Comments"
+          >
+            <i class="bi bi-chat-left-text"></i> ${commentCount}
+          </button>
+        </div>
+      `
+      
+      activeTextFileElement.innerHTML = headerHTML + AppState.activeTextFile.ActiveTemplate
       this.setupScrollTracking()
+
+      // Setup comments for this file
+      commentsController.setupCommentSelection()
+      commentsController.displayCommentsSidebar()
     } else {
       activeTextFileElement.innerHTML = `
         <div data-bs-toggle="offcanvas" data-bs-target="#settings-tab" class="placeholder-content text-center py-5">
@@ -117,7 +144,7 @@ export class TextFilesController {
 
     // Clamp between 0 and 100
     progressPercentage = Math.min(Math.max(progressPercentage, 0), 100)
-    console.log(`📈 Progress: ${progressPercentage.toFixed(2)}% (scroll: ${AppState.activeTextFile.maxScrollPosition}px)`)
+    // console.log(`📈 Progress: ${progressPercentage.toFixed(2)}% (scroll: ${AppState.activeTextFile.maxScrollPosition}px)`)
 
     // Update the active text file reading progress percentage
     AppState.activeTextFile.updateReadingProgress(progressPercentage)
@@ -154,7 +181,7 @@ export class TextFilesController {
     // Update bookmark if we're at a different paragraph
     if (currentParagraphIndex !== AppState.activeTextFile.lastParagraphRead) {
       AppState.activeTextFile.lastParagraphRead = currentParagraphIndex
-      console.log(`📍 Bookmark updated to paragraph ${currentParagraphIndex}`)
+      // console.log(`📍 Bookmark updated to paragraph ${currentParagraphIndex}`)
     }
 
     // Redraw the list to show updated progress
@@ -204,6 +231,9 @@ export class TextFilesController {
   }
 
   removeTextFile(textFileId) {
+    // Remove associated comments
+    commentsService.clearTextFileComments(textFileId)
+    // Remove the file
     textFilesService.removeTextFile(textFileId)
   }
 }
